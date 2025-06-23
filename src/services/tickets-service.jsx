@@ -4,76 +4,41 @@ class TicketsService {
   _maxRetries = 3;
 
   getSearchId = async () => {
-    try {
-      const res = await fetch(`${this._baseUrl}/search`);
-      const data = await res.json();
-      this.searchId = data.searchId;
-      return this.searchId;
-    } catch (error) {
-      console.error('Error while fetching searchId:', error);
-      throw error;
-    }
+    const res = await fetch(`${this._baseUrl}/search`);
+    if (!res.ok) throw new Error('Failed to get searchId');
+    const data = await res.json();
+    this.searchId = data.searchId;
+    return this.searchId;
   };
 
-  getTickets = async (dispatch) => {
-    try {
-      if (!this.searchId) {
-        await this.getSearchId();
+  getTickets = async () => {
+    if (!this.searchId) {
+      await this.getSearchId();
+    }
+
+    const url = new URL(`${this._baseUrl}/tickets`);
+    url.searchParams.set('searchId', this.searchId);
+
+    const fetchTicketsRecursively = async (retryCount = 0) => {
+      const res = await fetch(url);
+      if (!res.ok) {
+        if (retryCount < this._maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return fetchTicketsRecursively(retryCount + 1);
+        } else {
+          throw new Error('Server error 500');
+        }
+      }
+      const data = await res.json();
+
+      if (!data.stop) {
+        await fetchTicketsRecursively(0);
       }
 
-      const url = new URL(`${this._baseUrl}/tickets`);
-      url.searchParams.set('searchId', this.searchId);
+      return data.tickets;
+    };
 
-      const fetchTicketsRecursively = async (retryCount = 0) => {
-        try {
-          const ticketsResponse = await fetch(url);
-          const ticketsData = await ticketsResponse.json();
-
-          dispatch({
-            type: 'tickets/recieve-tickets',
-            payload: ticketsData.tickets,
-          });
-
-          if (ticketsResponse.status === 500) {
-            if (retryCount < this._maxRetries) {
-              setTimeout(() => fetchTicketsRecursively(retryCount + 1), 1000);
-              return;
-            } else {
-              dispatch({
-                type: 'tickets/error',
-              });
-              return;
-            }
-          }
-
-          if (!ticketsData.stop) {
-            setTimeout(() => fetchTicketsRecursively(0), 0);
-          }
-        } catch (error) {
-          if (retryCount < this._maxRetries) {
-            setTimeout(() => fetchTicketsRecursively(retryCount + 1), 1000);
-          } else {
-            dispatch({
-              type: 'tickets/error',
-              payload: `Ошибка при получении данных: ${error}`,
-            });
-          }
-        }
-      };
-
-      await fetchTicketsRecursively();
-    } catch (error) {
-      dispatch({
-        type: 'tickets/recieve-searchId',
-        payload: this.searchId,
-      });
-      dispatch({
-        type: 'tickets/recieve-tickets',
-        payload: [],
-        error: 'Ошибка при получении данных',
-      });
-      console.error('Error in getTickets:', error);
-    }
+    return fetchTicketsRecursively();
   };
 }
 

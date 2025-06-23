@@ -1,4 +1,4 @@
-export const filterFlights = (flights, stops) => {
+const filterFlights = (flights = [], stops) => {
   return flights.filter((flight) => {
     const stopsLength = flight.segments.reduce(
       (totalStops, segment) => totalStops + segment.stops.length,

@@ -1,22 +1,14 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import filterReducer from './features/filterSlice';
+import sortReducer from './features/sortSlice';
+import ticketsReducer from './features/ticketsSlice';
+import checkboxReducer from './features/checkboxSlice';  
 
-import ticketsReducer from './reducer/tickets';
-import checkboxReducer from './reducer/filter';
-import filterReducer from './reducer/sort';
-
-const rootReducer = combineReducers({
-  checkbox: checkboxReducer,
-  filter: filterReducer,
-  tickets: ticketsReducer,
+export const store = configureStore({
+  reducer: {
+    filter: filterReducer,
+    sort: sortReducer,
+    tickets: ticketsReducer,
+    checkbox: checkboxReducer, 
+  },
 });
-
-const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      immutableCheck: false,
-      serializableCheck: false,
-    }),
-});
-
-export default store;

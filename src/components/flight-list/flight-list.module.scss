@@ -25,3 +25,16 @@ ul {
 .loading-field span {
   padding-left: 4px;
 }
+
+.show-more-wrapper {
+  margin-top: 20px; /* или больше, под твой дизайн */
+  display: flex;
+  justify-content: center; /* по центру */
+}
+
+
+ul, ol {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}

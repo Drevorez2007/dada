@@ -1,17 +1,23 @@
 import React from 'react';
 import classes from './tabs.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { cheapest, shortest, resetFilter } from '../../redux/actions/sort';
+import {
+  cheapest,
+  shortest,
+  resetFilter,
+} from '../../redux/features/sortSlice'; // путь под твой проект
 
 export default function Tabs() {
   const dispatch = useDispatch();
-  const currentFilter = useSelector((state) => state.filter.filter);
+  const currentSort = useSelector((state) => state.sort.sort);
 
-  const handleButtonClick = (filter) => {
-    if (currentFilter === filter) {
+  const handleButtonClick = (sortType) => {
+    if (currentSort === sortType) {
       dispatch(resetFilter());
-    } else {
-      dispatch(filter === 'cheapest' ? cheapest() : shortest());
+    } else if (sortType === 'cheapest') {
+      dispatch(cheapest());
+    } else if (sortType === 'shortest') {
+      dispatch(shortest());
     }
   };
 
@@ -20,7 +26,7 @@ export default function Tabs() {
       <nav>
         <button
           className={
-            currentFilter === 'cheapest'
+            currentSort === 'cheapest'
               ? `${classes.button} ${classes.active}`
               : classes.button
           }
@@ -30,7 +36,7 @@ export default function Tabs() {
         </button>
         <button
           className={
-            currentFilter === 'shortest'
+            currentSort === 'shortest'
               ? `${classes.button} ${classes.active}`
               : classes.button
           }
