@@ -1,11 +1,12 @@
 import React from 'react';
 
 import logo from '../../assets/img/logo.svg';
+import classes from '../header/header.module.scss';
 
 export default function Header() {
   return (
-    <header className="header">
-      <img className="fly" src={logo} alt="" />
+    <header className={classes.header}>
+      <img className={classes.fly} src={logo} alt="" />
     </header>
   );
 }
