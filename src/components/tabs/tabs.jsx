@@ -5,7 +5,7 @@ import {
   cheapest,
   shortest,
   resetFilter,
-} from '../../redux/features/sortSlice'; // путь под твой проект
+} from '../../redux/features/sortSlice'; 
 
 export default function Tabs() {
   const dispatch = useDispatch();
